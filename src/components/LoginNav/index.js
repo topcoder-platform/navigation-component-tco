@@ -121,6 +121,7 @@ const LoginNav = ({
         <>
           <a
             href='javascript:void(0)'
+            className={styles.signupLabel}
             onClick={(event) => {
               const retUrl = encodeURIComponent(window.location.href)
               window.location = authURLs.location.replace('%S', retUrl).replace('member?', '#!/member?')

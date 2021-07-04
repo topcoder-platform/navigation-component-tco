@@ -12,24 +12,40 @@
   }
 }
 
+.signupLabel {
+  font-size: 14px;
+
+  @include mobile {
+    color: #E5E5E5;
+    font-family: Roboto;
+    font-size: 14px;
+    line-height: 30px;
+    text-align: left; 
+  }
+}
+
 .signup {
   display: block;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
-  height: 40px;
-  line-height: 40px;
-  margin-left: 20px;
+  height: 25px;
+  line-height: 27px;
+  margin-left: 10px;
+  margin-right: 80px;
   position: relative;
   text-decoration: none;
   text-transform: uppercase;
   transition: 0.5s;
   white-space: nowrap;
   background: #fff;
-  border-radius: 20px;
+  border-radius: 25px;
   color: #229174;
   padding: 0 15px;
 
-  @include hide-mobile;
+  // @include hide-mobile;
+  @include mobile {
+    margin-right: 10px;
+  }
 
   &:hover {
     background: rgba(255, 255, 255, 0.8);
