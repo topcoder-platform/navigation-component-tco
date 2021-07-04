@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import cn from 'classnames'
+import _ from 'lodash'
 import ResizeDetector from 'react-resize-detector'
 import { Link } from 'topcoder-react-utils'
 import ChosenArrow from '../ChosenArrow'
@@ -10,6 +11,7 @@ import MagnifyingGlass from '../../assets/images/magnifying_glass.svg'
 import styles from './PrimaryNav.module.scss'
 
 const PrimaryNav = ({
+  enableSearch,
   collapsed,
   showLeftMenu,
   logo,
@@ -39,6 +41,35 @@ const PrimaryNav = ({
   const activeTrigger = {
     bottom: 50 // The main nav head bottom Y
   }
+  const subMenuLength = _.get(menu, '[0].subMenu.length', 0)
+  const size = Math.ceil(subMenuLength / 2)
+  const renderItem = (level2, level2Params) => {
+    if (level2.imageSrc) {
+      return <Link
+        {...level2Params}
+        to={level2.href}
+        innerRef={createSetRef(level2.id)}
+      >
+        <img className={styles.imageItem} src={level2.imageSrc} />
+      </Link>
+    } else if (level2.href) {
+      return <Link
+        {...level2Params}
+        to={level2.href}
+        innerRef={createSetRef(level2.id)}
+      >
+        {level2.title}
+      </Link>
+    } else {
+      return <span
+        {...level2Params}
+        ref={createSetRef(level2.id)}
+      >
+        {level2.title}
+      </span>
+    }
+  }
+
   return (
     <div>
       <div className={cn(styles.primaryNavContainer, showLeftMenu && styles.primaryNavContainerOpen)}>
@@ -48,63 +79,40 @@ const PrimaryNav = ({
             onClick={(e) => onClickLogo(e)}
             to='/'
           >
-            {logo}
+            Back to Topcoder
           </Link>
           {menu.map((level1, i) => {
-            const level1Params = {
-              className: cn(styles.primaryLevel1, (!activeLevel2Id || showLeftMenu) && level1.id === activeLevel1Id && styles.primaryLevel1Open, level1.mobileOnly && styles.mobileOnly),
-              key: `level1-${i}`,
-              onClick: createHandleClickLevel1(level1.id, true)
-            }
             return ([
               <span className={styles.primaryLevel1Separator} key={`separator-${i}`} />,
-              /* Level 1 menu item */
-              level1.href
-                ? <Link
-                  {...level1Params}
-                  to={level1.href}
-                  innerRef={createSetRef(level1.id)}
-                >
-                  {level1.title}
-                </Link>
-                : <span
-                  {...level1Params}
-                  ref={createSetRef(level1.id)}
-                >
-                  {level1.title}
-                </span>,
-              /* Level 2 menu */
               level1.subMenu && (
                 <div
                   className={cn(styles.primaryLevel2Container, level1.id === activeLevel1Id && styles.primaryLevel2ContainerOpen)}
                   key={`level2-${i}-container`}
                   ref={createSetRef(`level2Container${i}`)}
                 >
-                  {level1.subMenu.filter(filterNotInMore).map((level2, i) => {
+                  {level1.subMenu.slice(0, size).filter(filterNotInMore).map((level2, i) => {
                     const level2Params = {
                       className: cn(styles.primaryLevel2, level2.id === activeLevel2Id && styles.primaryLevel2Open),
                       key: `level2-${i}`,
                       onClick: level2.subMenu && level2.subMenu.length > 0 ? createHandleClickLevel2(level2.id, true) : undefined
                     }
                     if ((level2.subMenu && level2.subMenu.length > 0) || level2.href) {
-                      return (
-                        level2.href
-                          ? <Link
-                            {...level2Params}
-                            to={level2.href}
-                            innerRef={createSetRef(level2.id)}
-                          >
-                            {level2.title}
-                          </Link>
-                          : <span
-                            {...level2Params}
-                            ref={createSetRef(level2.id)}
-                          >
-                            {level2.title}
-                          </span>
-                      )
+                      return renderItem(level2, level2Params)
                     }
                   })}
+                  {logo}
+                  {level1.subMenu.slice(size).filter(filterNotInMore).map((level2, i) => {
+                    const level2Params = {
+                      className: cn(styles.primaryLevel2, level2.id === activeLevel2Id && styles.primaryLevel2Open),
+                      key: `level2-${i}`,
+                      onClick: level2.subMenu && level2.subMenu.length > 0 ? createHandleClickLevel2(level2.id, true) : undefined
+                    }
+                    if ((level2.subMenu && level2.subMenu.length > 0) || level2.href) {
+                      return renderItem(level2, level2Params)
+                    }
+                  })}
+                  {(logo && size * 2 !== subMenuLength) && <div />}
+
                   {/* The More menu */}
                   {level1.id === activeLevel1Id && moreMenu && moreMenu.length > 0 && (
                     <div className={cn(styles.moreBtnContainer, openMore && styles.moreOpen)}>
@@ -160,7 +168,7 @@ const PrimaryNav = ({
               {rightMenu}
             </div>
           )}
-          <div
+          {enableSearch && <div
             aria-label='Find members by username or skill'
             role='button'
             tabIndex={0}
@@ -188,10 +196,10 @@ const PrimaryNav = ({
             }}
           >
             <MagnifyingGlass />
-          </div>
+          </div>}
         </div>
       </div>
-      <div
+      {enableSearch && <div
         role='search'
         className={cn(styles.searchField, { opened: searchOpened, closed: !searchOpened })}
         onMouseLeave={(event) => { toggleSearchOpen(false) }}
@@ -209,7 +217,7 @@ const PrimaryNav = ({
           aria-label='Find members by username or skill'
           placeholder='Find members by username or skill'
         />
-      </div>
+      </div>}
     </div>
   )
 }
@@ -236,6 +244,7 @@ PrimaryNav.propTypes = {
   showChosenArrow: PropTypes.bool,
   showLevel3: PropTypes.bool,
   forceHideLevel3: PropTypes.bool,
+  enableSearch: PropTypes.bool,
   chosenArrowX: PropTypes.number,
   searchOpened: PropTypes.bool,
   toggleSearchOpen: PropTypes.func

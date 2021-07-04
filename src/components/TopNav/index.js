@@ -7,7 +7,6 @@ import { config } from 'topcoder-react-utils'
 import styles from './index.module.scss'
 
 import MobileNav from './MobileNav'
-import MobileSubNav from './MobileSubNav'
 import MobileMenu from './MobileMenu'
 import PrimaryNav from './PrimaryNav'
 import SubNav from './SubNav'
@@ -16,6 +15,7 @@ const moreId = 'more'
 
 let id = 1
 let idForSecondary = 1000
+const disableShowMore = true
 
 const initMenuId = (menu, profileHandle, loggedIn) => {
   id = 1
@@ -73,6 +73,7 @@ const TopNav = ({
   openMore,
   loggedIn,
   profileHandle,
+  backURL,
   logoLink
 }) => {
   useEffect(() => {
@@ -109,7 +110,7 @@ const TopNav = ({
   const [leftNav, setLeftNav] = useState(menuWithId)
 
   const [showLeftMenu, setShowLeftMenu] = useState()
-  const [showMobileSubMenu, setShowMobileSubMenu] = useState()
+  // const [showMobileSubMenu, setShowMobileSubMenu] = useState()
 
   const [moreMenu, setMoreMenu] = useState()
 
@@ -184,11 +185,7 @@ const TopNav = ({
 
   const handleClickLogo = (e) => {
     e.preventDefault()
-    if (logoLink) {
-      window.location = logoLink
-    } else {
-      window.location = loggedIn ? config.URL.HOME : config.URL.BASE
-    }
+    window.location = backURL
   }
 
   const expandMenu = (menuId, menu2Id) => {
@@ -288,16 +285,15 @@ const TopNav = ({
   const handleClickLeftMenu = () => setShowLeftMenu(x => !x)
 
   const createHandleClickLevel2Mobile = menuId => () => {
-    setShowLeftMenu(false)
     setActiveLevel2Id(menuId)
   }
 
-  const createHandleClickLevel3Mobile = menuId => () => {
-    setActiveLevel3Id(menuId)
-    setShowMobileSubMenu(false)
-  }
+  // const createHandleClickLevel3Mobile = menuId => () => {
+  //   setActiveLevel3Id(menuId)
+  //   setShowMobileSubMenu(false)
+  // }
 
-  const handleClickSubMenu = () => setShowMobileSubMenu(x => !x)
+  // const handleClickSubMenu = () => setShowMobileSubMenu(x => !x)
 
   const setOverflow = useCallback(set => {
     cache.refs.primaryNav.style.overflow = set ? 'hidden' : ''
@@ -347,6 +343,7 @@ const TopNav = ({
 
   // show/hide level 2 more menu
   const generateMoreMenu = useCallback(() => {
+    if (disableShowMore) return
     // only proceed if more menu is empty
     if (moreMenu && moreMenu.length) return
     if (!activeMenu1 || !activeMenu1.subMenu) return
@@ -494,21 +491,10 @@ const TopNav = ({
           onClickLeftMenu={handleClickLeftMenu}
         />
 
-        {/* Mobile sub navigation (active level 2 menu) */}
-        {!showLeftMenu && (activeMenu2 || activeMenu1) && (
-          <MobileSubNav
-            open={showMobileSubMenu}
-            menu={activeMenu2 || activeMenu1}
-            isSecondaryMenu={!activeMenu2}
-            activeChildId={activeLevel3Id}
-            onClick={handleClickSubMenu}
-            createHandleClickItem={createHandleClickLevel3Mobile}
-          />
-        )}
-
         {/* Primary navigation (level 1 and level 2 menu) */}
         <PrimaryNav
           collapsed={collapsed}
+          enableSearch={false}
           showLeftMenu={showLeftMenu}
           logo={logo}
           menu={leftNav}
@@ -556,7 +542,9 @@ const TopNav = ({
           <MobileMenu
             menu={activeMenu1}
             activeChildId={activeLevel2Id}
+            onClickLogo={handleClickLogo}
             createHandleClickItem={createHandleClickLevel2Mobile}
+            rightMenu={rightMenu}
           />
         )}
 
@@ -577,6 +565,9 @@ TopNav.propTypes = {
    *   - title {string|element} The title
    *   - href {string} The href for wrapper anchor
    *   - subMenu {array} Children menu
+   *       - imgSrc {string} The href for wrapper anchor
+   *       - href {string} The href for wrapper anchor
+   *       - title {string|element} The title
    */
   menu: PropTypes.array.isRequired,
 
@@ -592,6 +583,9 @@ TopNav.propTypes = {
   onChangeLevel1Id: PropTypes.func,
 
   path: PropTypes.string,
+
+  // back url
+  backURL: PropTypes.string.isRequired,
 
   setOpenMore: PropTypes.func,
 

@@ -1,0 +1,815 @@
+From 92944f4417693439ee7728f86077b21df50150e6 Mon Sep 17 00:00:00 2001
+From: yoution <zhuyan207@gmail.com>
+Date: Wed, 30 Jun 2021 20:58:00 +0800
+Subject: [PATCH] Header Navi Component
+
+---
+ src/assets/sass/_global/_utils.scss          |  6 ++
+ src/components/LoginNav/index.js             |  1 +
+ src/components/LoginNav/styles.module.scss   | 34 +++++--
+ src/components/TopNav/MobileMenu.js          | 80 +++++++++++++----
+ src/components/TopNav/MobileMenu.module.scss | 81 +++++++++++++----
+ src/components/TopNav/MobileNav.js           |  7 +-
+ src/components/TopNav/MobileNav.module.scss  |  7 +-
+ src/components/TopNav/PrimaryNav.js          | 95 +++++++++++---------
+ src/components/TopNav/PrimaryNav.module.scss | 46 ++++++++--
+ src/components/TopNav/index.js               | 44 ++++-----
+ src/components/UserInfo/styles.module.scss   |  6 +-
+ 11 files changed, 282 insertions(+), 125 deletions(-)
+
+diff --git a/src/assets/sass/_global/_utils.scss b/src/assets/sass/_global/_utils.scss
+index 79e4fa5..be26146 100644
+--- a/src/assets/sass/_global/_utils.scss
++++ b/src/assets/sass/_global/_utils.scss
+@@ -36,6 +36,12 @@
+   }
+ }
+ 
++@mixin screen-1440 {
++  @media (max-width: 1339px) {
++    @content;
++  }
++}
++
+ @mixin backdrop {
+   .backdrop {
+     position: fixed;
+diff --git a/src/components/LoginNav/index.js b/src/components/LoginNav/index.js
+index 800619e..93e1235 100644
+--- a/src/components/LoginNav/index.js
++++ b/src/components/LoginNav/index.js
+@@ -121,6 +121,7 @@ const LoginNav = ({
+         <>
+           <a
+             href='javascript:void(0)'
++            className={styles.signupLabel}
+             onClick={(event) => {
+               const retUrl = encodeURIComponent(window.location.href)
+               window.location = authURLs.location.replace('%S', retUrl).replace('member?', '#!/member?')
+diff --git a/src/components/LoginNav/styles.module.scss b/src/components/LoginNav/styles.module.scss
+index 540f637..925776c 100644
+--- a/src/components/LoginNav/styles.module.scss
++++ b/src/components/LoginNav/styles.module.scss
+@@ -12,28 +12,48 @@
+   }
+ }
+ 
++.signupLabel {
++  font-size: 14px;
++
++  @include mobile {
++    color: #E5E5E5;
++    font-family: Roboto;
++    font-size: 14px;
++    line-height: 30px;
++    text-align: left; 
++  }
++}
++
+ .signup {
+   display: block;
+-  font-size: 14px;
++  font-size: 12px;
+   font-weight: 700;
+-  height: 40px;
+-  line-height: 40px;
+-  margin-left: 20px;
++  height: 25px;
++  line-height: 27px;
++  margin-left: 10px;
++  margin-right: 80px;
+   position: relative;
+   text-decoration: none;
+   text-transform: uppercase;
+   transition: 0.5s;
+   white-space: nowrap;
+   background: #fff;
+-  border-radius: 20px;
++  border-radius: 25px;
+   color: #229174;
+   padding: 0 15px;
+ 
+-  @include hide-mobile;
++  // @include hide-mobile;
++  @include mobile {
++    margin-right: 10px;
++  }
++
++  @include screen-1440 {
++    margin-right: 20px;
++  }
+ 
+   &:hover {
+     background: rgba(255, 255, 255, 0.8);
+     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+     color: #229174;
+   }
+-}
+\ No newline at end of file
++}
+diff --git a/src/components/TopNav/MobileMenu.js b/src/components/TopNav/MobileMenu.js
+index c35182a..08df93b 100644
+--- a/src/components/TopNav/MobileMenu.js
++++ b/src/components/TopNav/MobileMenu.js
+@@ -1,30 +1,74 @@
+ import React from 'react'
+ import PropTypes from 'prop-types'
++import _ from 'lodash'
++import { Link } from 'topcoder-react-utils'
+ import cn from 'classnames'
+ import styles from './MobileMenu.module.scss'
+ 
+-const MobileMenu = ({ menu, activeChildId, createHandleClickItem }) => (
+-  <div className={styles.secondaryNavMobile}>
+-    {menu.subMenu && menu.subMenu.map((level2, i) => {
+-      if ((level2.subMenu && level2.subMenu.length > 0) || level2.href) {
+-        return (
+-          <a
+-            className={cn(styles.secondaryNavMobileItem, level2.id === activeChildId && styles.secondaryNavMobileItemOpen)}
+-            href={level2.href}
+-            key={`level2-${i}`}
+-            onClick={level2.subMenu && level2.subMenu.length > 0 ? createHandleClickItem(level2.id) : null}
+-          >
+-            {level2.title}
+-          </a>
+-        )
+-      }
+-    })}
+-  </div>
+-)
++const MobileMenu = ({ rightMenu, onClickLogo, menu, activeChildId, createHandleClickItem }) => {
++  const getSubMenu = (items) => {
++    if (!items) {
++      return null
++    }
++    return items.map((i, k) => {
++      return (
++        <a
++          className={styles.menuItem}
++          href={i.href}
++          key={`level3-${k}`}
++        >
++          {i.title}
++        </a>
++      )
++    })
++  }
++
++  const renderItem = (item) => {
++    if (item.imageSrc) {
++      return <img className={styles.imageItem} src={item.imageSrc} />
++    } else {
++      return item.title
++    }
++  }
++
++  return (
++    <div className={styles.secondaryNavMobile}>
++      {menu.subMenu && menu.subMenu.map((level2, i) => {
++        if ((level2.subMenu && level2.subMenu.length > 0) || level2.href) {
++          return (
++            <>
++              <a
++                className={cn(styles.secondaryNavMobileItem, level2.id === activeChildId && styles.secondaryNavMobileItemOpen)}
++                href={!_.get(level2, 'subMenu.length', 0) && level2.href}
++                key={`level2-${i}`}
++                onClick={level2.subMenu && level2.subMenu.length > 0 ? createHandleClickItem(level2.id) : null}
++              >
++                {renderItem(level2)}
++              </a>
++              {level2.id === activeChildId && getSubMenu(level2.subMenu)}
++            </>
++          )
++        }
++      })}
++      <div className={styles.bottomMenu}>
++        <Link
++          onClick={(e) => onClickLogo(e)}
++          to='/'
++        >
++          Back to Topcoder
++        </Link>
++        <span className={styles.line} />
++        {rightMenu}
++      </div>
++    </div>
++  )
++}
+ 
+ MobileMenu.propTypes = {
+   menu: PropTypes.object,
+   activeChildId: PropTypes.any,
++  onClickLogo: PropTypes.func,
++  rightMenu: PropTypes.node,
+   createHandleClickItem: PropTypes.func
+ }
+ 
+diff --git a/src/components/TopNav/MobileMenu.module.scss b/src/components/TopNav/MobileMenu.module.scss
+index 35493db..52308e4 100644
+--- a/src/components/TopNav/MobileMenu.module.scss
++++ b/src/components/TopNav/MobileMenu.module.scss
+@@ -2,22 +2,63 @@
+ @import "../../assets/sass/_global/themes";
+ @import "../../assets/sass/_global/utils";
+ 
++.menuItem {
++  color: #FFFFFF;
++  font-family: Roboto;
++  font-size: 16px;
++  line-height: 46px;
++  height: 46px;
++  opacity: 0.75;
++  text-align: left;
++  &:active, &:hover {
++    color: #FFFFFF;
++    font-family: Roboto;
++    opacity: 0.75;
++  }
++}
++
++.line {
++  display: block;
++  height: 30px;
++  width: 1px;
++  background: #555555;
++}
++
++.imageItem {
++  width: 100px;
++  height: 25px;
++}
++
++.bottomMenu {
++  position: absolute;
++  height: 60px;
++  bottom: 0;
++  width: calc(100% - 40px);
++  border-top: 1px solid #555555;
++  display: flex;
++  align-items: center;
++  justify-content: space-between;
++  
++  > a {
++    color: #E5E5E5;
++    font-size: 14px;
++  }
++}
+ .secondaryNavMobile {
+   display: flex;
+   flex-direction: column;
+   padding: $base-unit * 3 $base-unit * 4;
++  padding: 0 20px;
+   z-index: 1;
+-
+-  @include themify($themes) {
+-    background: themed('secondaryBackgroundColor');
+-  }
++  position: fixed;
++  height: calc(100% - 60px);
++  width: 100%;
++  background-color: #2A2A2B;
+ 
+   .secondaryNavMobileItem {
+-    @include themify($themes) {
+-      color: themed('secondaryTextColor');
+-    }
+-
+-    font-size: 18px;
++    position: relative;
++    color: #FFF;
++    font-size: 21px;
+     line-height: 40px;
+     height: 40px;
+     margin: 5px 0;
+@@ -28,16 +69,22 @@
+     &.secondaryNavMobileItemOpen {
+       @include Roboto-Bold;
+       @include not-clickable;
++      color: #43D7B0;
+ 
+-      &::before {
++      &::after {
++        border-color: #43D7B0;
++      }    
++    }
++    &::after {
+         content: "";
+-        height: 30px;
+-        width: 3px;
+-        border-radius: 1.5px;
+-        background: $turquoise;
++        border: solid #FFF;
++        border-width: 0 2px 2px 0;
+         display: inline-block;
+-        margin-right: 10px;
++        padding: 5px;
++        position: absolute;
++        right: 7px;
++        transform: rotate(
++45deg);
+       }
+-    }
+   }
+-}
+\ No newline at end of file
++}
+diff --git a/src/components/TopNav/MobileNav.js b/src/components/TopNav/MobileNav.js
+index 3a1eb3f..de975d6 100644
+--- a/src/components/TopNav/MobileNav.js
++++ b/src/components/TopNav/MobileNav.js
+@@ -5,7 +5,7 @@ import IconClose from '../../assets/images/icon-close.svg'
+ import IconMenu from '../../assets/images/icon-menu.svg'
+ import IconMagnifyingGlass from '../../assets/images/magnifying_glass.svg'
+ 
+-const MobileNav = ({ showLeftMenu, onClickLeftMenu, logo, onClickLogo, rightMenu }) => (<div>
++const MobileNav = ({ enableSearch, showLeftMenu, onClickLeftMenu, logo, onClickLogo, rightMenu }) => (<div>
+   <div className={styles.mobileNav}>
+     <div className={styles.leftMenuContainer}>
+       <button className={styles.menuBtn} onClick={onClickLeftMenu}>
+@@ -21,13 +21,13 @@ const MobileNav = ({ showLeftMenu, onClickLeftMenu, logo, onClickLogo, rightMenu
+       href='/'>
+       {logo}
+     </a>
+-    {rightMenu && (
++    {!showLeftMenu && rightMenu && (
+       <div className={styles.rightMenu}>
+         {rightMenu}
+       </div>
+     )}
+   </div>
+-  {showLeftMenu && (
++  {enableSearch && showLeftMenu && (
+     <div className={styles.search}>
+       <IconMagnifyingGlass className={styles.icon} />
+       <input
+@@ -48,6 +48,7 @@ const MobileNav = ({ showLeftMenu, onClickLeftMenu, logo, onClickLogo, rightMenu
+ 
+ MobileNav.propTypes = {
+   showLeftMenu: PropTypes.bool,
++  enableSearch: PropTypes.bool,
+   onClickLeftMenu: PropTypes.func,
+   logo: PropTypes.node,
+   onClickLogo: PropTypes.func,
+diff --git a/src/components/TopNav/MobileNav.module.scss b/src/components/TopNav/MobileNav.module.scss
+index 37359c7..24fe842 100644
+--- a/src/components/TopNav/MobileNav.module.scss
++++ b/src/components/TopNav/MobileNav.module.scss
+@@ -6,6 +6,7 @@
+   background: $gray-90;
+   display: flex;
+   justify-content: center;
++  border-bottom: 1px solid #555555;
+   position: relative;
+   align-items: center;
+ 
+@@ -35,6 +36,10 @@
+     @include Roboto-Bold;
+     cursor: pointer;
+ 
++    a[id="button_signup"] {
++      display: none
++    }
++
+     color: $white;
+     font-size: 16px;
+     line-height: 30px;
+@@ -85,4 +90,4 @@
+     box-shadow: none;
+     outline: none;
+   }
+-}
+\ No newline at end of file
++}
+diff --git a/src/components/TopNav/PrimaryNav.js b/src/components/TopNav/PrimaryNav.js
+index bbdf796..88ec01c 100644
+--- a/src/components/TopNav/PrimaryNav.js
++++ b/src/components/TopNav/PrimaryNav.js
+@@ -1,6 +1,7 @@
+ import React from 'react'
+ import PropTypes from 'prop-types'
+ import cn from 'classnames'
++import _ from 'lodash'
+ import ResizeDetector from 'react-resize-detector'
+ import { Link } from 'topcoder-react-utils'
+ import ChosenArrow from '../ChosenArrow'
+@@ -10,6 +11,7 @@ import MagnifyingGlass from '../../assets/images/magnifying_glass.svg'
+ import styles from './PrimaryNav.module.scss'
+ 
+ const PrimaryNav = ({
++  enableSearch,
+   collapsed,
+   showLeftMenu,
+   logo,
+@@ -39,6 +41,35 @@ const PrimaryNav = ({
+   const activeTrigger = {
+     bottom: 50 // The main nav head bottom Y
+   }
++  const subMenuLength = _.get(menu, '[0].subMenu.length', 0)
++  const size = Math.ceil(subMenuLength / 2)
++  const renderItem = (level2, level2Params) => {
++    if (level2.imageSrc) {
++      return <Link
++        {...level2Params}
++        to={level2.href}
++        innerRef={createSetRef(level2.id)}
++      >
++        <img className={styles.imageItem} src={level2.imageSrc} />
++      </Link>
++    } else if (level2.href) {
++      return <Link
++        {...level2Params}
++        to={level2.href}
++        innerRef={createSetRef(level2.id)}
++      >
++        {level2.title}
++      </Link>
++    } else {
++      return <span
++        {...level2Params}
++        ref={createSetRef(level2.id)}
++      >
++        {level2.title}
++      </span>
++    }
++  }
++
+   return (
+     <div>
+       <div className={cn(styles.primaryNavContainer, showLeftMenu && styles.primaryNavContainerOpen)}>
+@@ -48,63 +79,40 @@ const PrimaryNav = ({
+             onClick={(e) => onClickLogo(e)}
+             to='/'
+           >
+-            {logo}
++            Back to Topcoder
+           </Link>
+           {menu.map((level1, i) => {
+-            const level1Params = {
+-              className: cn(styles.primaryLevel1, (!activeLevel2Id || showLeftMenu) && level1.id === activeLevel1Id && styles.primaryLevel1Open, level1.mobileOnly && styles.mobileOnly),
+-              key: `level1-${i}`,
+-              onClick: createHandleClickLevel1(level1.id, true)
+-            }
+             return ([
+               <span className={styles.primaryLevel1Separator} key={`separator-${i}`} />,
+-              /* Level 1 menu item */
+-              level1.href
+-                ? <Link
+-                  {...level1Params}
+-                  to={level1.href}
+-                  innerRef={createSetRef(level1.id)}
+-                >
+-                  {level1.title}
+-                </Link>
+-                : <span
+-                  {...level1Params}
+-                  ref={createSetRef(level1.id)}
+-                >
+-                  {level1.title}
+-                </span>,
+-              /* Level 2 menu */
+               level1.subMenu && (
+                 <div
+                   className={cn(styles.primaryLevel2Container, level1.id === activeLevel1Id && styles.primaryLevel2ContainerOpen)}
+                   key={`level2-${i}-container`}
+                   ref={createSetRef(`level2Container${i}`)}
+                 >
+-                  {level1.subMenu.filter(filterNotInMore).map((level2, i) => {
++                  {level1.subMenu.slice(0, size).filter(filterNotInMore).map((level2, i) => {
++                    const level2Params = {
++                      className: cn(styles.primaryLevel2, level2.id === activeLevel2Id && styles.primaryLevel2Open),
++                      key: `level2-${i}`,
++                      onClick: level2.subMenu && level2.subMenu.length > 0 ? createHandleClickLevel2(level2.id, true) : undefined
++                    }
++                    if ((level2.subMenu && level2.subMenu.length > 0) || level2.href) {
++                      return renderItem(level2, level2Params)
++                    }
++                  })}
++                  {logo}
++                  {level1.subMenu.slice(size).filter(filterNotInMore).map((level2, i) => {
+                     const level2Params = {
+                       className: cn(styles.primaryLevel2, level2.id === activeLevel2Id && styles.primaryLevel2Open),
+                       key: `level2-${i}`,
+                       onClick: level2.subMenu && level2.subMenu.length > 0 ? createHandleClickLevel2(level2.id, true) : undefined
+                     }
+                     if ((level2.subMenu && level2.subMenu.length > 0) || level2.href) {
+-                      return (
+-                        level2.href
+-                          ? <Link
+-                            {...level2Params}
+-                            to={level2.href}
+-                            innerRef={createSetRef(level2.id)}
+-                          >
+-                            {level2.title}
+-                          </Link>
+-                          : <span
+-                            {...level2Params}
+-                            ref={createSetRef(level2.id)}
+-                          >
+-                            {level2.title}
+-                          </span>
+-                      )
++                      return renderItem(level2, level2Params)
+                     }
+                   })}
++                  {(logo && size * 2 !== subMenuLength) && <div />}
++
+                   {/* The More menu */}
+                   {level1.id === activeLevel1Id && moreMenu && moreMenu.length > 0 && (
+                     <div className={cn(styles.moreBtnContainer, openMore && styles.moreOpen)}>
+@@ -160,7 +168,7 @@ const PrimaryNav = ({
+               {rightMenu}
+             </div>
+           )}
+-          <div
++          {enableSearch && <div
+             aria-label='Find members by username or skill'
+             role='button'
+             tabIndex={0}
+@@ -188,10 +196,10 @@ const PrimaryNav = ({
+             }}
+           >
+             <MagnifyingGlass />
+-          </div>
++          </div>}
+         </div>
+       </div>
+-      <div
++      {enableSearch && <div
+         role='search'
+         className={cn(styles.searchField, { opened: searchOpened, closed: !searchOpened })}
+         onMouseLeave={(event) => { toggleSearchOpen(false) }}
+@@ -209,7 +217,7 @@ const PrimaryNav = ({
+           aria-label='Find members by username or skill'
+           placeholder='Find members by username or skill'
+         />
+-      </div>
++      </div>}
+     </div>
+   )
+ }
+@@ -236,6 +244,7 @@ PrimaryNav.propTypes = {
+   showChosenArrow: PropTypes.bool,
+   showLevel3: PropTypes.bool,
+   forceHideLevel3: PropTypes.bool,
++  enableSearch: PropTypes.bool,
+   chosenArrowX: PropTypes.number,
+   searchOpened: PropTypes.bool,
+   toggleSearchOpen: PropTypes.func
+diff --git a/src/components/TopNav/PrimaryNav.module.scss b/src/components/TopNav/PrimaryNav.module.scss
+index d834cd5..5189678 100644
+--- a/src/components/TopNav/PrimaryNav.module.scss
++++ b/src/components/TopNav/PrimaryNav.module.scss
+@@ -10,11 +10,12 @@
+ .primaryNavContainer {
+   display: flex;
+ 
+-  @include hide-mobile;
+-
+   &.primaryNavContainerOpen {
++    @include hide-mobile;
+     display: flex;
+   }
++
++  @include hide-mobile;
+ }
+ 
+ .primaryNav {
+@@ -55,11 +56,18 @@
+ }
+ 
+ .tcLogo {
+-  margin: 0 50px 0 $base-unit * 6;
+   cursor: pointer;
+-
++  color: #E5E5E5;
++  font-size: 12px;
++  font-weight: 500;
++  margin-left: 79px;
++  margin-right: 14px;
+   @include hide-mobile;
+ 
++  @include screen-1440 {
++    margin-left: 20px;
++  }
++
+   &.tcLogoPush {
+     margin-right: auto;
+   }
+@@ -109,6 +117,11 @@
+   
+       @include hide-mobile;
+     }
++    > svg {
++      width: 100px;
++      height: 24px;
++      margin: 0 30px;
++    }
+   }
+ 
+   &.primaryLevel1Open {
+@@ -116,19 +129,34 @@
+   }
+ }
+ 
++
++.imageItem {
++  width: 100px;
++  height: 25px;
++}
+ .primaryLevel2Container {
+   white-space: nowrap;
+   width: 0;
+-  opacity: 0;
++  display: flex;
++  flex:1;
++  justify-content: center;
+   overflow: hidden; 
+ 
++  > * {
++    margin-left: 20px;
++    margin-right: 20px;
++  }
++  
++  > svg {
++    margin-left: 60px;
++    margin-right: 60px;
++  }
++
++
+   &.primaryLevel2ContainerOpen {
+     display: flex;
+     overflow: unset;
+-    margin-right: auto;    
+     width: auto;
+-    opacity: 1;
+-    transition: opacity 400ms ease-in 100ms;
+ 
+     @include hide-mobile;
+   }
+@@ -312,4 +340,4 @@
+       color: $gray-15;
+     }
+   }
+-}
+\ No newline at end of file
++}
+diff --git a/src/components/TopNav/index.js b/src/components/TopNav/index.js
+index dce4028..a73fb9d 100644
+--- a/src/components/TopNav/index.js
++++ b/src/components/TopNav/index.js
+@@ -7,7 +7,6 @@ import { config } from 'topcoder-react-utils'
+ import styles from './index.module.scss'
+ 
+ import MobileNav from './MobileNav'
+-import MobileSubNav from './MobileSubNav'
+ import MobileMenu from './MobileMenu'
+ import PrimaryNav from './PrimaryNav'
+ import SubNav from './SubNav'
+@@ -16,6 +15,7 @@ const moreId = 'more'
+ 
+ let id = 1
+ let idForSecondary = 1000
++const disableShowMore = true
+ 
+ const initMenuId = (menu, profileHandle, loggedIn) => {
+   id = 1
+@@ -73,6 +73,7 @@ const TopNav = ({
+   openMore,
+   loggedIn,
+   profileHandle,
++  backURL,
+   logoLink
+ }) => {
+   useEffect(() => {
+@@ -109,7 +110,7 @@ const TopNav = ({
+   const [leftNav, setLeftNav] = useState(menuWithId)
+ 
+   const [showLeftMenu, setShowLeftMenu] = useState()
+-  const [showMobileSubMenu, setShowMobileSubMenu] = useState()
++  // const [showMobileSubMenu, setShowMobileSubMenu] = useState()
+ 
+   const [moreMenu, setMoreMenu] = useState()
+ 
+@@ -184,11 +185,7 @@ const TopNav = ({
+ 
+   const handleClickLogo = (e) => {
+     e.preventDefault()
+-    if (logoLink) {
+-      window.location = logoLink
+-    } else {
+-      window.location = loggedIn ? config.URL.HOME : config.URL.BASE
+-    }
++    window.location = backURL
+   }
+ 
+   const expandMenu = (menuId, menu2Id) => {
+@@ -288,16 +285,15 @@ const TopNav = ({
+   const handleClickLeftMenu = () => setShowLeftMenu(x => !x)
+ 
+   const createHandleClickLevel2Mobile = menuId => () => {
+-    setShowLeftMenu(false)
+     setActiveLevel2Id(menuId)
+   }
+ 
+-  const createHandleClickLevel3Mobile = menuId => () => {
+-    setActiveLevel3Id(menuId)
+-    setShowMobileSubMenu(false)
+-  }
++  // const createHandleClickLevel3Mobile = menuId => () => {
++  //   setActiveLevel3Id(menuId)
++  //   setShowMobileSubMenu(false)
++  // }
+ 
+-  const handleClickSubMenu = () => setShowMobileSubMenu(x => !x)
++  // const handleClickSubMenu = () => setShowMobileSubMenu(x => !x)
+ 
+   const setOverflow = useCallback(set => {
+     cache.refs.primaryNav.style.overflow = set ? 'hidden' : ''
+@@ -347,6 +343,7 @@ const TopNav = ({
+ 
+   // show/hide level 2 more menu
+   const generateMoreMenu = useCallback(() => {
++    if (disableShowMore) return
+     // only proceed if more menu is empty
+     if (moreMenu && moreMenu.length) return
+     if (!activeMenu1 || !activeMenu1.subMenu) return
+@@ -494,21 +491,10 @@ const TopNav = ({
+           onClickLeftMenu={handleClickLeftMenu}
+         />
+ 
+-        {/* Mobile sub navigation (active level 2 menu) */}
+-        {!showLeftMenu && (activeMenu2 || activeMenu1) && (
+-          <MobileSubNav
+-            open={showMobileSubMenu}
+-            menu={activeMenu2 || activeMenu1}
+-            isSecondaryMenu={!activeMenu2}
+-            activeChildId={activeLevel3Id}
+-            onClick={handleClickSubMenu}
+-            createHandleClickItem={createHandleClickLevel3Mobile}
+-          />
+-        )}
+-
+         {/* Primary navigation (level 1 and level 2 menu) */}
+         <PrimaryNav
+           collapsed={collapsed}
++          enableSearch={false}
+           showLeftMenu={showLeftMenu}
+           logo={logo}
+           menu={leftNav}
+@@ -556,7 +542,9 @@ const TopNav = ({
+           <MobileMenu
+             menu={activeMenu1}
+             activeChildId={activeLevel2Id}
++            onClickLogo={handleClickLogo}
+             createHandleClickItem={createHandleClickLevel2Mobile}
++            rightMenu={rightMenu}
+           />
+         )}
+ 
+@@ -577,6 +565,9 @@ TopNav.propTypes = {
+    *   - title {string|element} The title
+    *   - href {string} The href for wrapper anchor
+    *   - subMenu {array} Children menu
++   *       - imgSrc {string} The href for wrapper anchor
++   *       - href {string} The href for wrapper anchor
++   *       - title {string|element} The title
+    */
+   menu: PropTypes.array.isRequired,
+ 
+@@ -593,6 +584,9 @@ TopNav.propTypes = {
+ 
+   path: PropTypes.string,
+ 
++  // back url
++  backURL: PropTypes.string.isRequired,
++
+   setOpenMore: PropTypes.func,
+ 
+   openMore: PropTypes.bool,
+diff --git a/src/components/UserInfo/styles.module.scss b/src/components/UserInfo/styles.module.scss
+index f3ef600..9480dee 100644
+--- a/src/components/UserInfo/styles.module.scss
++++ b/src/components/UserInfo/styles.module.scss
+@@ -44,7 +44,9 @@
+       margin-left: 5px;
+       white-space: nowrap;
+ 
+-      @include hide-mobile;
++      @include mobile {
++        color: #FFF
++      }
+     }
+ 
+     .dropdownIcon {
+@@ -70,7 +72,7 @@
+     .handleContainer .handle {
+       display: block;
+ 
+-      @include hide-mobile;
++      // @include hide-mobile;
+     }
+   }
+ 
+-- 
+2.21.1 (Apple Git-122.3)
+
