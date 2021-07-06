@@ -10,6 +10,7 @@ import MagnifyingGlass from '../../assets/images/magnifying_glass.svg'
 import styles from './PrimaryNav.module.scss'
 
 const PrimaryNav = ({
+  enableSearch,
   collapsed,
   showLeftMenu,
   logo,
@@ -33,12 +34,40 @@ const PrimaryNav = ({
   forceHideLevel3,
   chosenArrowX,
   searchOpened,
-  toggleSearchOpen
+  toggleSearchOpen,
+  backToTcUrl,
+  backToTcUrlText
 }) => {
   const filterNotInMore = menu => !(moreMenu || []).find(x => x.id === menu.id)
   const activeTrigger = {
     bottom: 50 // The main nav head bottom Y
   }
+  const renderItem = (level2, level2Params) => {
+    if (level2.imageSrc) {
+      return <span
+        {...level2Params}
+        ref={createSetRef(level2.id)}
+      >
+        <img className={styles.imageItem} src={level2.imageSrc} />
+      </span>
+    } else if (level2.href) {
+      return <Link
+        {...level2Params}
+        to={level2.href}
+        innerRef={createSetRef(level2.id)}
+      >
+        {level2.title}
+      </Link>
+    } else {
+      return <span
+        {...level2Params}
+        ref={createSetRef(level2.id)}
+      >
+        {level2.title}
+      </span>
+    }
+  }
+
   return (
     <div>
       <div className={cn(styles.primaryNavContainer, showLeftMenu && styles.primaryNavContainerOpen)}>
@@ -46,34 +75,13 @@ const PrimaryNav = ({
           <Link
             className={cn(styles.tcLogo, collapsed && styles.tcLogoPush)}
             onClick={(e) => onClickLogo(e)}
-            to='/'
+            to={backToTcUrl}
           >
-            {logo}
+            {backToTcUrlText || 'Back to Topcoder'}
           </Link>
           {menu.map((level1, i) => {
-            const level1Params = {
-              className: cn(styles.primaryLevel1, (!activeLevel2Id || showLeftMenu) && level1.id === activeLevel1Id && styles.primaryLevel1Open, level1.mobileOnly && styles.mobileOnly),
-              key: `level1-${i}`,
-              onClick: createHandleClickLevel1(level1.id, true)
-            }
             return ([
               <span className={styles.primaryLevel1Separator} key={`separator-${i}`} />,
-              /* Level 1 menu item */
-              level1.href
-                ? <Link
-                  {...level1Params}
-                  to={level1.href}
-                  innerRef={createSetRef(level1.id)}
-                >
-                  {level1.title}
-                </Link>
-                : <span
-                  {...level1Params}
-                  ref={createSetRef(level1.id)}
-                >
-                  {level1.title}
-                </span>,
-              /* Level 2 menu */
               level1.subMenu && (
                 <div
                   className={cn(styles.primaryLevel2Container, level1.id === activeLevel1Id && styles.primaryLevel2ContainerOpen)}
@@ -86,25 +94,11 @@ const PrimaryNav = ({
                       key: `level2-${i}`,
                       onClick: level2.subMenu && level2.subMenu.length > 0 ? createHandleClickLevel2(level2.id, true) : undefined
                     }
-                    if ((level2.subMenu && level2.subMenu.length > 0) || level2.href) {
-                      return (
-                        level2.href
-                          ? <Link
-                            {...level2Params}
-                            to={level2.href}
-                            innerRef={createSetRef(level2.id)}
-                          >
-                            {level2.title}
-                          </Link>
-                          : <span
-                            {...level2Params}
-                            ref={createSetRef(level2.id)}
-                          >
-                            {level2.title}
-                          </span>
-                      )
+                    if ((level2.subMenu && level2.subMenu.length > 0) || level2.href || level2.imageSrc) {
+                      return renderItem(level2, level2Params)
                     }
                   })}
+
                   {/* The More menu */}
                   {level1.id === activeLevel1Id && moreMenu && moreMenu.length > 0 && (
                     <div className={cn(styles.moreBtnContainer, openMore && styles.moreOpen)}>
@@ -128,15 +122,10 @@ const PrimaryNav = ({
                           }
                           return (
                             menu.href
-                              ? <Link
-                                {...menuParams}
-                                to={menu.href}
-                              >
+                              ? <Link {...menuParams} to={menu.href}>
                                 {menu.title}
                               </Link>
-                              : <span
-                                {...menuParams}
-                              >
+                              : <span {...menuParams}>
                                 {menu.title}
                               </span>
                           )
@@ -160,7 +149,7 @@ const PrimaryNav = ({
               {rightMenu}
             </div>
           )}
-          <div
+          {enableSearch && <div
             aria-label='Find members by username or skill'
             role='button'
             tabIndex={0}
@@ -188,10 +177,10 @@ const PrimaryNav = ({
             }}
           >
             <MagnifyingGlass />
-          </div>
+          </div>}
         </div>
       </div>
-      <div
+      {enableSearch && <div
         role='search'
         className={cn(styles.searchField, { opened: searchOpened, closed: !searchOpened })}
         onMouseLeave={(event) => { toggleSearchOpen(false) }}
@@ -209,7 +198,7 @@ const PrimaryNav = ({
           aria-label='Find members by username or skill'
           placeholder='Find members by username or skill'
         />
-      </div>
+      </div>}
     </div>
   )
 }
@@ -236,9 +225,12 @@ PrimaryNav.propTypes = {
   showChosenArrow: PropTypes.bool,
   showLevel3: PropTypes.bool,
   forceHideLevel3: PropTypes.bool,
+  enableSearch: PropTypes.bool,
   chosenArrowX: PropTypes.number,
   searchOpened: PropTypes.bool,
-  toggleSearchOpen: PropTypes.func
+  toggleSearchOpen: PropTypes.func,
+  backToTcUrl: PropTypes.string,
+  backToTcUrlText: PropTypes.string
 }
 
 export default PrimaryNav

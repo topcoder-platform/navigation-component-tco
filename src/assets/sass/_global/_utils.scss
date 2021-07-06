@@ -36,6 +36,12 @@
   }
 }
 
+@mixin screen-1440 {
+  @media (max-width: 1339px) {
+    @content;
+  }
+}
+
 @mixin backdrop {
   .backdrop {
     position: fixed;

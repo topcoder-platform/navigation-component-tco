@@ -35,6 +35,10 @@
     @include Roboto-Bold;
     cursor: pointer;
 
+    a[id="button_signup"] {
+      display: none
+    }
+
     color: $white;
     font-size: 16px;
     line-height: 30px;

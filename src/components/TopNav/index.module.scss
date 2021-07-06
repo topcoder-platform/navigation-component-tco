@@ -1,9 +1,16 @@
 @import "../../assets/sass/_global/variables";
+@import "../../assets/sass/_global/utils";
 
 .headerNavUi {
   font-family: "Roboto", Helvetica, Arial, sans-serif;
   color: $gray-90;
   position: relative;
+
+  @include mobile {
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+  }
 
   a {
     text-decoration: none;

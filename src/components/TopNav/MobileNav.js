@@ -5,7 +5,7 @@ import IconClose from '../../assets/images/icon-close.svg'
 import IconMenu from '../../assets/images/icon-menu.svg'
 import IconMagnifyingGlass from '../../assets/images/magnifying_glass.svg'
 
-const MobileNav = ({ showLeftMenu, onClickLeftMenu, logo, onClickLogo, rightMenu }) => (<div>
+const MobileNav = ({ enableSearch, showLeftMenu, onClickLeftMenu, logo, onClickLogo, rightMenu }) => (<div>
   <div className={styles.mobileNav}>
     <div className={styles.leftMenuContainer}>
       <button className={styles.menuBtn} onClick={onClickLeftMenu}>
@@ -21,13 +21,13 @@ const MobileNav = ({ showLeftMenu, onClickLeftMenu, logo, onClickLogo, rightMenu
       href='/'>
       {logo}
     </a>
-    {rightMenu && (
+    {!showLeftMenu && rightMenu && (
       <div className={styles.rightMenu}>
         {rightMenu}
       </div>
     )}
   </div>
-  {showLeftMenu && (
+  {enableSearch && showLeftMenu && (
     <div className={styles.search}>
       <IconMagnifyingGlass className={styles.icon} />
       <input
@@ -48,6 +48,7 @@ const MobileNav = ({ showLeftMenu, onClickLeftMenu, logo, onClickLogo, rightMenu
 
 MobileNav.propTypes = {
   showLeftMenu: PropTypes.bool,
+  enableSearch: PropTypes.bool,
   onClickLeftMenu: PropTypes.func,
   logo: PropTypes.node,
   onClickLogo: PropTypes.func,
