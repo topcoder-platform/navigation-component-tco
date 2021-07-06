@@ -131,7 +131,7 @@
 
 
 .imageItem {
-  margin: 0 40px;
+  margin: 0 80px !important;
 }
 .primaryLevel2Container {
   white-space: nowrap;
@@ -140,7 +140,8 @@
   flex:1;
   margin: 0 20px;
   justify-content: center;
-  overflow: hidden; 
+  overflow: hidden;
+  opacity: 1;
 
   > * {
     margin-left: 20px;

@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
-import { Link } from 'topcoder-react-utils'
 import cn from 'classnames'
 import styles from './MobileMenu.module.scss'
 
@@ -55,12 +54,11 @@ const MobileMenu = ({
         })}
       </div>
       <div className={styles.bottomMenu}>
-        <Link
-          onClick={(e) => onClickLogo(e)}
-          to={backToTcUrl}
+        <a
+          href={backToTcUrl}
         >
           {backToTcUrlText || 'Back to Topcoder'}
-        </Link>
+        </a>
         <span className={styles.line} />
         {rightMenu}
       </div>

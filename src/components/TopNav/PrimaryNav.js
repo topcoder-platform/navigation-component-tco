@@ -44,12 +44,16 @@ const PrimaryNav = ({
   }
   const renderItem = (level2, level2Params) => {
     if (level2.imageSrc) {
-      return <span
-        {...level2Params}
-        ref={createSetRef(level2.id)}
-      >
-        <img className={styles.imageItem} src={level2.imageSrc} />
-      </span>
+      if (level2.href) {
+        return <a
+          {...level2Params}
+          href={level2.href}
+          innerRef={createSetRef(level2.id)}
+        >
+          <img className={styles.imageItem} src={level2.imageSrc} />
+        </a>
+      }
+      return <img className={styles.imageItem} src={level2.imageSrc} />
     } else if (level2.href) {
       return <Link
         {...level2Params}
@@ -72,13 +76,12 @@ const PrimaryNav = ({
     <div>
       <div className={cn(styles.primaryNavContainer, showLeftMenu && styles.primaryNavContainerOpen)}>
         <div className={styles.primaryNav} ref={createSetRef('primaryNav')}>
-          <Link
+          <a
             className={cn(styles.tcLogo, collapsed && styles.tcLogoPush)}
-            onClick={(e) => onClickLogo(e)}
-            to={backToTcUrl}
+            href={backToTcUrl}
           >
             {backToTcUrlText || 'Back to Topcoder'}
-          </Link>
+          </a>
           {menu.map((level1, i) => {
             return ([
               <span className={styles.primaryLevel1Separator} key={`separator-${i}`} />,

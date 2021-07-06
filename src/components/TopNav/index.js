@@ -557,7 +557,8 @@ const TopNav = ({
 TopNav.defaultProps = {
   theme: 'light',
   onChangeLevel1Id: () => null,
-  backToTcUrl: '/'
+  backToTcUrl: '/',
+  backURL: '/'
 }
 
 TopNav.propTypes = {
@@ -587,7 +588,7 @@ TopNav.propTypes = {
   path: PropTypes.string,
 
   // back url
-  backURL: PropTypes.string.isRequired,
+  backURL: PropTypes.string,
 
   setOpenMore: PropTypes.func,
 
