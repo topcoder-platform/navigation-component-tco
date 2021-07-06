@@ -10,11 +10,12 @@
 .primaryNavContainer {
   display: flex;
 
-  @include hide-mobile;
-
   &.primaryNavContainerOpen {
+    @include hide-mobile;
     display: flex;
   }
+
+  @include hide-mobile;
 }
 
 .primaryNav {
@@ -55,10 +56,17 @@
 }
 
 .tcLogo {
-  margin: 0 50px 0 $base-unit * 6;
   cursor: pointer;
-
+  color: #E5E5E5 !important;
+  font-size: 12px;
+  font-weight: 500;
+  margin-left: 79px;
+  margin-right: 14px;
   @include hide-mobile;
+
+  @include screen-1440 {
+    margin-left: 20px;
+  }
 
   &.tcLogoPush {
     margin-right: auto;
@@ -109,6 +117,11 @@
   
       @include hide-mobile;
     }
+    > svg {
+      width: 100px;
+      height: 24px;
+      margin: 0 30px;
+    }
   }
 
   &.primaryLevel1Open {
@@ -116,19 +129,34 @@
   }
 }
 
+
+.imageItem {
+  margin: 0 40px;
+}
 .primaryLevel2Container {
   white-space: nowrap;
   width: 0;
-  opacity: 0;
+  display: flex;
+  flex:1;
+  margin: 0 20px;
+  justify-content: center;
   overflow: hidden; 
+
+  > * {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+  
+  > svg {
+    margin-left: 60px;
+    margin-right: 60px;
+  }
+
 
   &.primaryLevel2ContainerOpen {
     display: flex;
     overflow: unset;
-    margin-right: auto;    
     width: auto;
-    opacity: 1;
-    transition: opacity 400ms ease-in 100ms;
 
     @include hide-mobile;
   }
@@ -140,7 +168,7 @@
 
 .primaryLevel2 {
   @include Roboto-Bold;
-  margin-left: $base-unit * 6;
+  // margin-left: $base-unit * 6;
   font-size: 14px;
   line-height: 30px;
   text-align: center;
@@ -167,8 +195,7 @@
     @include button-reset;
     position: relative;
     color: $white;
-    margin-left: $base-unit * 4;
-    width: 74px;
+    width: 54px;
     height: 30px;
     display: flex;
     justify-content: center;

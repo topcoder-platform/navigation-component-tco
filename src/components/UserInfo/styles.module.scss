@@ -44,7 +44,9 @@
       margin-left: 5px;
       white-space: nowrap;
 
-      @include hide-mobile;
+      @include mobile {
+        color: #FFF
+      }
     }
 
     .dropdownIcon {
@@ -70,7 +72,7 @@
     .handleContainer .handle {
       display: block;
 
-      @include hide-mobile;
+      // @include hide-mobile;
     }
   }
 
