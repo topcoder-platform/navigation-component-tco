@@ -858,16 +858,6 @@
 
         &.isOpen {
           @include Roboto-Bold;
-
-          &::before {
-            content: "";
-            height: 30px;
-            width: 3px;
-            border-radius: 1.5px;
-            background: $white;
-            display: inline-block;
-            margin-right: 10px;
-          }
         }
       }
     }
@@ -922,16 +912,6 @@
 
         &.isOpen {
           @include Roboto-Bold;
-
-          &::before {
-            content: "";
-            height: 30px;
-            width: 3px;
-            border-radius: 1.5px;
-            background: $turquoise;
-            display: inline-block;
-            margin-right: 10px;
-          }
         }
       }
     }

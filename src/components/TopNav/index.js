@@ -486,6 +486,7 @@ const TopNav = ({
           onClickLogo={handleClickLogo}
           rightMenu={rightMenu}
           onClickLeftMenu={handleClickLeftMenu}
+          loggedIn={loggedIn}
         />
 
         {/* Primary navigation (level 1 and level 2 menu) */}

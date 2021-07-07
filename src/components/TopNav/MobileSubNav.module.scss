@@ -90,18 +90,6 @@
       &.mobileSubNavChildOpen {
         @include Roboto-Bold;
         @include not-clickable;
-
-        &::before {
-          content: "";
-          height: 30px;
-          width: 3px;
-          border-radius: 1.5px;
-          @include themify($themes) {
-            background: themed('beforeBackground');
-          }
-          display: inline-block;
-          margin-right: 10px;
-        }
       }
     }
   }

@@ -46,7 +46,7 @@ const PrimaryNav = ({
     if (level2.imageSrc) {
       return <span
         {...level2Params}
-        ref={createSetRef(level2.id)}
+        style={{ cursor: 'default' }}
       >
         <img className={styles.imageItem} src={level2.imageSrc} />
       </span>

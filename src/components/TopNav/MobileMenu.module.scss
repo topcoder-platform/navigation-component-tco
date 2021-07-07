@@ -14,9 +14,11 @@
   font-family: Roboto;
   font-size: 16px;
   line-height: 30px;
-  height: 46px;
+  height: auto;
   opacity: 0.75;
   text-align: left;
+  margin: 8px 0;
+
   &:active, &:hover {
     color: #FFFFFF;
     font-family: Roboto;
@@ -68,7 +70,7 @@
     font-size: 21px;
     line-height: 25px;
     height: auto;
-    margin: 0 0 30px;
+    margin: 15px 0;
     display: flex;
     align-items: center;
     cursor: pointer;
@@ -83,9 +85,13 @@
       font-family: Barlow;
       font-weight: 600;
 
+      &::before {
+        display: none;
+      }
+
       &::after {
         border-color: #43D7B0;
-      }    
+      }
     }
     &.hasSubMenu::before {
       display: none;
