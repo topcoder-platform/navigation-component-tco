@@ -40,14 +40,14 @@ const MobileMenu = ({
           if ((level2.subMenu && level2.subMenu.length > 0) || level2.href) {
             return (
               <>
-                <a
+                <Link
                   className={cn(styles.secondaryNavMobileItem, level2.id === activeChildId && styles.secondaryNavMobileItemOpen, level2.subMenu && styles.hasSubMenu)}
-                  href={!_.get(level2, 'subMenu.length', 0) && level2.href}
+                  to={!_.get(level2, 'subMenu.length', 0) && level2.href}
                   key={`level2-${i}`}
                   onClick={level2.subMenu && level2.subMenu.length > 0 ? createHandleClickItem(level2.id) : null}
                 >
                   {renderItem(level2)}
-                </a>
+                </Link>
                 {level2.subMenu && level2.id === activeChildId && getSubMenu(level2.subMenu)}
               </>
             )
