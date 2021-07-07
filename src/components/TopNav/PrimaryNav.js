@@ -74,7 +74,6 @@ const PrimaryNav = ({
         <div className={styles.primaryNav} ref={createSetRef('primaryNav')}>
           <Link
             className={cn(styles.tcLogo, collapsed && styles.tcLogoPush)}
-            onClick={(e) => onClickLogo(e)}
             to={backToTcUrl}
           >
             {backToTcUrlText || 'Back to Topcoder'}

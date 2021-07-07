@@ -56,7 +56,6 @@ const MobileMenu = ({
       </div>
       <div className={styles.bottomMenu}>
         <Link
-          onClick={(e) => onClickLogo(e)}
           to={backToTcUrl}
         >
           {backToTcUrlText || 'Back to Topcoder'}

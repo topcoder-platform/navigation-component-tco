@@ -558,7 +558,8 @@ const TopNav = ({
 TopNav.defaultProps = {
   theme: 'light',
   onChangeLevel1Id: () => null,
-  backToTcUrl: '/'
+  backToTcUrl: '/',
+  backURL: '/'
 }
 
 TopNav.propTypes = {
