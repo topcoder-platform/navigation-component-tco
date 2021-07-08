@@ -5,8 +5,6 @@
   font-family: "Roboto", Helvetica, Arial, sans-serif;
   color: $gray-90;
   position: relative;
-  max-width: 100%;
-  overflow: hidden;
 
   @include mobile {
     position: fixed;

@@ -15,7 +15,6 @@
   font-size: 16px;
   line-height: 30px;
   height: auto;
-  opacity: 0.75;
   text-align: left;
   margin: 8px 0;
 
@@ -23,6 +22,23 @@
     color: #FFFFFF;
     font-family: Roboto;
     opacity: 0.75;
+  }
+
+  &.menuItemCurrent {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    opacity: 0.75;
+
+    &::before {
+      content: "";
+      height: 20px;
+      width: 3px;
+      border-radius: 1.5px;
+      background: $turquoise;
+      display: inline-block;
+      margin-right: 8px;
+    }
   }
 }
 

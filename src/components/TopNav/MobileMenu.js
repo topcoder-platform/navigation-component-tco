@@ -1,6 +1,6 @@
+import _ from 'lodash'
 import React from 'react'
 import PropTypes from 'prop-types'
-import _ from 'lodash'
 import { Link } from 'topcoder-react-utils'
 import cn from 'classnames'
 import styles from './MobileMenu.module.scss'
@@ -12,15 +12,16 @@ const MobileMenu = ({
     if (!items) {
       return null
     }
+    const { pathname } = window.location
     return items.map((i, k) => {
       return (
-        <a
-          className={styles.menuItem}
-          href={i.href}
+        <Link
+          className={cn(styles.menuItem, i.href === pathname && styles.menuItemCurrent)}
+          to={i.href}
           key={`level3-${k}`}
         >
           {i.title}
-        </a>
+        </Link>
       )
     })
   }
@@ -40,14 +41,15 @@ const MobileMenu = ({
           if ((level2.subMenu && level2.subMenu.length > 0) || level2.href) {
             return (
               <>
-                <a
+                <Link
                   className={cn(styles.secondaryNavMobileItem, level2.id === activeChildId && styles.secondaryNavMobileItemOpen, level2.subMenu && styles.hasSubMenu)}
-                  href={!_.get(level2, 'subMenu.length', 0) && level2.href}
+                  to={!_.get(level2, 'subMenu.length', 0) && level2.href}
+                  enforceA={level2.subMenu && level2.subMenu.length > 0}
                   key={`level2-${i}`}
                   onClick={level2.subMenu && level2.subMenu.length > 0 ? createHandleClickItem(level2.id) : null}
                 >
                   {renderItem(level2)}
-                </a>
+                </Link>
                 {level2.subMenu && level2.id === activeChildId && getSubMenu(level2.subMenu)}
               </>
             )
