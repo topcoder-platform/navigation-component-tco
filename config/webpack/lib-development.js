@@ -24,7 +24,7 @@ module.exports = function configFactory (ops) {
   return baseFactory({
     ...ops,
     babelEnv: 'development',
-    cssLocalIdent: '[path][name]___[local]___[hash:base64:6]',
+    cssLocalIdent: 'navi_tco_[path][name]___[local]___[hash:base64:7]',
     mode: 'development',
     outputPath: path.resolve(__dirname, ops.context, 'dist/dev')
   })

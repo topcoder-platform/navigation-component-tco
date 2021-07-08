@@ -4,7 +4,7 @@ const path = require('path')
 const standardConfig = configFactory({
   context: path.resolve(__dirname, '../..'),
   entry: './src',
-  library: 'navigation-component'
+  library: 'navigation-component-tco'
 })
 
 module.exports = standardConfig

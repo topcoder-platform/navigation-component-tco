@@ -26,7 +26,7 @@ module.exports = function configFactory (ops) {
   const baseConfig = baseFactory({
     ...ops,
     babelEnv: 'production',
-    cssLocalIdent: '[hash:base64:6]',
+    cssLocalIdent: 'navi_tco_[hash:base64:7]',
     mode: 'production',
     outputPath: path.resolve(__dirname, ops.context, 'dist/prod'),
   });
