@@ -145,6 +145,7 @@
   flex:1;
   margin: 0 20px;
   justify-content: center;
+  align-items: center;
   overflow: hidden;
   opacity: 1;
 
@@ -156,6 +157,10 @@
   > svg {
     margin-left: 60px;
     margin-right: 60px;
+  }
+
+  img {
+    margin-bottom: 10px;
   }
 
 
